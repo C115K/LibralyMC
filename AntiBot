@@ -1,0 +1,53 @@
+package com.example.antibot;
+
+import com.velocitypowered.api.event.Listener;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.plugin.annotation.VelocityPlugin;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
+import java.util.HashSet;
+
+@VelocityPlugin(id = "antibot", name = "AntiBot Plugin", version = "1.0", authors = {"YourName"})
+public class AntiBotPlugin {
+
+    private final ProxyServer server;
+    private final HashSet<String> suspiciousPlayers = new HashSet<>();
+
+    public AntiBotPlugin(ProxyServer server, @DataDirectory Path dataDirectory) {
+        this.server = server;
+    }
+
+    @Listener
+    public void onPreLogin(PreLoginEvent event) {
+        // Example: Block players with suspicious usernames (e.g., bots often use random names)
+        String username = event.getUsername();
+        if (username.length() < 4 || username.length() > 16 || username.contains("bot")) {
+            event.setResult(PreLoginEvent.PreLoginComponentResult.denied("Suspicious username."));
+        }
+    }
+
+    @Listener
+    public void onPostLogin(PostLoginEvent event) {
+        Player player = event.getPlayer();
+        
+        // If this player is already flagged as suspicious, kick them
+        if (suspiciousPlayers.contains(player.getUsername())) {
+            player.disconnect("You were flagged as a bot.");
+            return;
+        }
+
+        // Detecting too-fast connection attempts
+        // Example: Add delay for the player to check their behavior
+        server.getScheduler().buildTask(this, () -> {
+            if (!player.isActive()) {
+                suspiciousPlayers.add(player.getUsername()); // Flagging the player as suspicious
+                player.disconnect("Disconnected for suspicious behavior.");
+            }
+        }).delay(5, TimeUnit.SECONDS).schedule();
+    }
+}
