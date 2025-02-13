@@ -1,0 +1,57 @@
+Key Features of This Plugin:
+Scoreboard Creation:
+
+This code creates a new scoreboard with the title Player Stats.
+The objective is registered under the name "scoreboard", and it’s displayed in the sidebar using DisplaySlot.SIDEBAR.
+Update Loop:
+
+The plugin updates the scoreboard every second (20 ticks). It pulls dynamic information like Health and Ping and updates the player's scoreboard accordingly.
+Health Display:
+
+The scoreboard shows the player's current health in the format Health: <value>, where <value> is the player’s current health.
+Ping Display:
+
+The plugin fetches the player's ping (network latency) and displays it as Ping: <value>. The method getPing(player) retrieves the ping from the player object.
+Build and Install the Plugin:
+Build the Plugin:
+
+If you use Maven, run the following command to build your plugin:
+bash
+Kopiuj
+mvn clean package
+Place the Plugin on the Server:
+
+Once the .jar file is created, move it to the plugins/ directory of your Spigot or Paper server.
+Start the Server:
+
+Restart your server or reload it, and the plugin should automatically display a scoreboard to players when they join.
+Enhancements and Customization:
+Custom Scoreboard Titles:
+
+You can modify the title of the scoreboard by changing the "Player Stats" string in the Objective creation. You can make it dynamic by including the player’s name or other info.
+Add More Data:
+
+You can add more dynamic data to the scoreboard, such as the player’s XP, Money, Rank, or Custom Stats. Just modify the updateScoreboard method to include additional scores.
+Player-Specific Scoreboards:
+
+If you want to give each player a unique scoreboard, you can create a separate Scoreboard object for each player and update them individually.
+Clear the Scoreboard:
+
+If you want to clear the scoreboard when the player logs off, you can listen for the PlayerQuitEvent and clear the player’s scoreboard.
+Example of Adding More Data (Custom Stats):
+Let’s say you want to add a custom stat like "Kills" (using player.getStatistic(Statistic.MOB_KILLS)):
+
+java
+Kopiuj
+private void updateScoreboard(Player player, Scoreboard scoreboard) {
+    player.setScoreboard(scoreboard);
+    Objective objective = scoreboard.getObjective("scoreboard");
+
+    objective.getScore("Health: " + (int) player.getHealth()).setScore(1);
+    objective.getScore("Ping: " + getPing(player)).setScore(2);
+    
+    int kills = player.getStatistic(Statistic.MOB_KILLS);
+    objective.getScore("Kills: " + kills).setScore(3);
+}
+Conclusion:
+This simple Scoreboard Plugin for Minecraft 1.19.4 creates a scoreboard that updates regularly and shows useful information like health and ping. You can expand this plugin with more dynamic data or customize it further depending on your server's needs. If you need further enhancements or explanations, feel free to ask!
